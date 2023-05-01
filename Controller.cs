@@ -224,5 +224,39 @@ namespace moxbot
                 });
             }
         }
+
+        public static void СonfirmMessage(string UserMessage, long? peerId)
+        {
+            try
+            {
+                if (UserMessage[0] == 'я' && UserMessage[1] == ' ')
+
+                {
+                    string reply = UserMessage.Replace("я ", "");
+
+                    var message = new MessagesSendParams
+
+                    {
+                        Message = $"Капец он реально {reply} 😮😮😮",
+
+                        PeerId = peerId,
+                        RandomId = 0,
+
+                        Intent = Intent.Default
+
+
+                    };
+
+                    Program.api.Messages.SendAsync(message);
+
+                }
+            }
+            catch 
+            {
+
+                Program.LongPoll();
+            }
+ 
+        }
     }
 }

@@ -89,6 +89,8 @@ namespace Mohostani
                         Controller.Roullete(getUserMes.UserMessage, getPeerId.PeerId);
 
                         Controller.TextAniimation(getUserMes.UserMessage, getPeerId.PeerId, getChatMesId.ChatMessageId);
+
+                        Controller.СonfirmMessage(getUserMes.UserMessage, getPeerId.PeerId);
                     }
                 }
 
