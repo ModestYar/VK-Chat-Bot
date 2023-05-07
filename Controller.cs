@@ -12,28 +12,28 @@ namespace moxbot
     internal class Controller
     {
         
-        public static void MessageToChat(string UserMessage, long? peerId) // отправка текстовых сообщений по команде
+        public static void MessageToChat(string UserMessage, long? peerId, SqlConnection sqlConnection) // отправка текстовых сообщений по команде
         {
-
-            if (UserMessage == "я")
-
-            {
-                var message = new MessagesSendParams
-
+                if (SqlManager.IsExist(sqlConnection, $"SELECT COUNT(*) as count FROM Command WHERE Command = N'{UserMessage}'"))
                 {
-                    Message = "крутой",
+                    string command = SqlManager.GetString(sqlConnection, $"SELECT Message FROM Command WHERE Command = N'{UserMessage}'");
 
-                    PeerId = peerId,
-                    RandomId = 0,
+                    var message = new MessagesSendParams
 
-                    Intent = Intent.Default
+                    {
+                        Message = command,
+
+                        PeerId = peerId,
+                        RandomId = 0,
+
+                        Intent = Intent.Default
 
 
-                };
+                    };
 
-                Program.api.Messages.SendAsync(message);
-
-            }
+                    Program.api.Messages.SendAsync(message);
+                }
+        
         }
 
         public static void StickerToChat(string UserMessage, long? peerId) // отправка текстовых сообщений по команде

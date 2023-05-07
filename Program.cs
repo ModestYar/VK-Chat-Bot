@@ -79,7 +79,7 @@ namespace Mohostani
 
                         getChatMesId.ChatMessageId = ((VkNet.Model.GroupUpdate.MessageNew)a.Instance).Message.ConversationMessageId;
 
-                        Controller.MessageToChat (getUserMes.UserMessage, getPeerId.PeerId);
+                        Controller.MessageToChat (getUserMes.UserMessage, getPeerId.PeerId, sqlConnection);
 
                         Controller.StickerToChat(getUserMes.UserMessage, getPeerId.PeerId);
 

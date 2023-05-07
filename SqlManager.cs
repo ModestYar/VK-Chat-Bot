@@ -11,7 +11,6 @@ namespace moxbot
     {
         public static int CountOfLines(SqlConnection sqlConnection, string request)
         {
-            string sqlRequest = request;
 
             SqlCommand command = new SqlCommand(request, sqlConnection);
 
@@ -22,13 +21,24 @@ namespace moxbot
 
         public static string GetString(SqlConnection sqlConnection, string request)
         {
-            string sqlRequest = request;
 
             SqlCommand command = new SqlCommand(request, sqlConnection);
 
             string confirmMessage = command.ExecuteScalar().ToString();
 
             return confirmMessage;
+        }
+
+        public static bool IsExist (SqlConnection sqlConnection, string request) // Через Count (Извините через EXISTS не получилось)
+        {
+            bool isExist = false;
+            SqlCommand command = new SqlCommand(request, sqlConnection);
+
+            int confirmMessage = Convert.ToInt32(command.ExecuteScalar());
+            if (confirmMessage == 1)
+                isExist = true;
+
+            return isExist;
         }
     }
 }
