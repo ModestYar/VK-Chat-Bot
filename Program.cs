@@ -1,32 +1,31 @@
-﻿using System;
-using VkNet;
+﻿using VkNet;
 using VkNet.Model;
 using VkNet.Model.RequestParams;
 using VkNet.Model.GroupUpdate;
 using VkNet.Enums.SafetyEnums;
-using Ini;
 using moxbot;
+using System.Data;
+using System.Data.SqlClient;
+using System.Configuration;
 
 namespace Mohostani
 {
     class Program
-    {
-        static string[] lines = File.ReadLines("Config.ini").ToArray();
-        static Dictionary<string, Ini.Category> result = Ini.Parser.Parse(lines);
-        static Category BotConfig = result["BotConfig"];
-
-        static string key = BotConfig.GetEntryByKey("Key").Value;
-        static int groupId = Convert.ToInt32(BotConfig.GetEntryByKey("GroupID").Value);
+    {        
+        static string key = ConfigurationManager.AppSettings["VKToken"];
+        static int groupId = Convert.ToInt32(ConfigurationManager.AppSettings["GroupID"]);
+        static SqlConnection sqlConnection;
         public static VkApi api = new VkApi();
         public string? UserMessage { get; set; }
         public long? PeerId { get; set; }
         public long? ChatMessageId { get; set; }
+        
 
         
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
             Auth();
-
+            SqlConnect();
             LongPoll(); 
         }
         public static void Auth() // авторизация
@@ -47,17 +46,15 @@ namespace Mohostani
             Program getChatMesId = new Program();
 
 
-            while (true)
-            {
-                var s = api.Groups.GetLongPollServer(ulong.Parse(groupId.ToString()));
+                var ConnectionData = api.Groups.GetLongPollServer(ulong.Parse(groupId.ToString()));
 
                 var poll = api.Groups.GetBotsLongPollHistory(new BotsLongPollHistoryParams()
                 {
-                    Server = s.Server,
+                    Server = ConnectionData.Server,
 
-                    Ts = s.Ts,
+                    Ts = ConnectionData.Ts,
 
-                    Key = s.Key,
+                    Key = ConnectionData.Key,
 
                     Wait = 25
 
@@ -67,7 +64,7 @@ namespace Mohostani
 
                 if (poll?.Updates == null)
                 {
-                    continue;
+                    LongPoll();
                 }
                 //»копаемся» в новом событие
 
@@ -90,13 +87,28 @@ namespace Mohostani
 
                         Controller.TextAniimation(getUserMes.UserMessage, getPeerId.PeerId, getChatMesId.ChatMessageId);
 
-                        Controller.СonfirmMessage(getUserMes.UserMessage, getPeerId.PeerId);
+                        Controller.СonfirmMessage(getUserMes.UserMessage, getPeerId.PeerId, sqlConnection);
+
+                        Controller.SeparateMessage(getUserMes.UserMessage, getPeerId.PeerId);
+
+                        Controller.RandomMessage(getUserMes.UserMessage, getPeerId.PeerId);
                     }
                 }
+            LongPoll();
+        }
 
-            }
-        }    
+        public static void SqlConnect()
+        {
+            sqlConnection = new SqlConnection(ConfigurationManager.ConnectionStrings["MoxDB"].ConnectionString);
 
- 
+            sqlConnection.Open();
+
+            if (sqlConnection.State == ConnectionState.Open)
+                Console.WriteLine("БАЗА ПОДРУБЛЕНА");
+            else
+                Console.WriteLine("НЕ РОБЯТ БАЗЫ");
+        }
+
+        
     }
 }

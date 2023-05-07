@@ -2,3 +2,8 @@ Config.ini
 bin
 *.sln
 obj
+*.config
+*.db
+*.mdf
+*.ldf
+Properties

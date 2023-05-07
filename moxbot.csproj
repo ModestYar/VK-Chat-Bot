@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -9,6 +9,8 @@
 
   <ItemGroup>
     <PackageReference Include="ini-parser" Version="2.5.2" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="7.0.0" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
     <PackageReference Include="VkBotFramework" Version="1.0.0" />
     <PackageReference Include="VkNet" Version="1.73.0" />
   </ItemGroup>

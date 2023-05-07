@@ -3,6 +3,9 @@ using System;
 using VkNet.Enums.SafetyEnums;
 using VkNet.Model.RequestParams;
 using VkNet.Model;
+using System.Xml;
+using VkNet.Enums;
+using System.Data.SqlClient;
 
 namespace moxbot
 {
@@ -225,19 +228,23 @@ namespace moxbot
             }
         }
 
-        public static void СonfirmMessage(string UserMessage, long? peerId)
+        public static void СonfirmMessage(string UserMessage, long? peerId, SqlConnection sqlConnection)
         {
             try
             {
+                Random rand = new Random();
+
                 if (UserMessage[0] == 'я' && UserMessage[1] == ' ')
 
                 {
-                    string reply = UserMessage.Replace("я ", "");
+                    string reply = UserMessage.TrimStart('я');
+                    int countOfMessages = SqlManager.CountOfLines(sqlConnection, "SELECT COUNT(DISTINCT id) as count FROM Confirm");
+                    string confirmMessage = SqlManager.GetString(sqlConnection, $"SELECT Message FROM Confirm WHERE id = {rand.Next(1, countOfMessages)}");
 
                     var message = new MessagesSendParams
 
                     {
-                        Message = $"Капец он реально {reply} 😮😮😮",
+                        Message = $"{confirmMessage}{reply} 🤔🤔🤔",
 
                         PeerId = peerId,
                         RandomId = 0,
@@ -254,9 +261,75 @@ namespace moxbot
             catch 
             {
 
-                Program.LongPoll();
+               Program.LongPoll();
             }
  
+        }
+
+        public static void SeparateMessage(string UserMessage, long? peerId)
+        {
+
+
+            if (UserMessage == "олег сегодня мох?")
+                
+            {
+                for (int i = 0; i < 5; i++)
+                {
+                    var date = DateTime.Now;
+                    string sepMessage = "ЕЩЁ КАКОЙ! ЯБ ЕМУ В СУП МЫШЬЯК ЗАКИНУЛ";
+                    var message = new MessagesSendParams
+
+                    {
+                        Message = sepMessage,
+
+                        PeerId = peerId,
+                        RandomId = 0,
+
+                        Intent = Intent.Default
+                        
+
+                    };
+
+                    Program.api.Messages.SendAsync(message);
+                    Thread.Sleep(1000);
+                }
+            }
+        }
+
+        public static void RandomMessage(string UserMessage, long? peerId)
+        {
+
+            var rand = new Random();
+
+            IEnumerable<ulong> MessageId = new List<ulong> { (ulong)rand.Next(741500,742000) };
+            IEnumerable<string> listValues3 = new List<string> { "олег мох" };
+
+            if (UserMessage == "давай")
+
+            {
+                var messageInfo = Program.api.Messages.GetByConversationMessageId((long)peerId, MessageId, listValues3);
+                foreach (var item in messageInfo.Items)
+                {
+                    var message = new MessagesSendParams
+
+                    {
+                        Message = item.Text,
+
+                        PeerId = peerId,
+                        RandomId = 0,
+
+                        Intent = Intent.Default
+
+                    };
+
+                    Program.api.Messages.SendAsync(message);
+ 
+                }
+              
+
+            }
+
+
         }
     }
 }
