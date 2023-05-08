@@ -37,15 +37,21 @@ namespace moxbot
 
         public static void Roullete(string UserMessage, long? peerId) // выбор случайного пользователя по команде
         {
-            if (UserMessage == "кто мох")
+            if (UserMessage != "" && UserMessage.Length > 4)
             {
-                var randomuser = Program.api.Messages.GetConversationMembers((long)peerId);
+                if (UserMessage[0] == 'к' && UserMessage[1] == 'т' && UserMessage[3] == ' ')
+                {
+                    string who = "кто";
+                    
+                    var randomuser = Program.api.Messages.GetConversationMembers((long)peerId);
+                    string reply = UserMessage.TrimStart(who.ToCharArray()).TrimEnd('?');
+                    Random rnd = new Random();
+                    string name = randomuser.Profiles[rnd.Next(0, randomuser.Profiles.Count)].FirstName;
 
-                Random rnd = new Random();
-                string name = randomuser.Profiles[rnd.Next(0, randomuser.Profiles.Count)].FirstName;
-
-                SendingManager.MessageToChat(name, peerId);
+                    SendingManager.MessageToChat($"{name}{reply}", peerId);
+                }
             }
+
         }
 
         public static void TextAniimation(string UserMessage, long? peerId, long? ChatMessageId, SqlConnection sqlConnection)
@@ -59,7 +65,7 @@ namespace moxbot
 
                 string request = SqlManager.GetString(sqlConnection, $"SELECT Request FROM TextAnimationsCommands WHERE Command = N'{UserMessage}'");
                 
-                for (int i = 1; i < countOfLines; i++)
+                for (int i = 1; i <= countOfLines; i++)
                 {
                     string message = SqlManager.GetString(sqlConnection, $"{request}{i}");
                     SendingManager.EditMessageIntoChat(message, peerId, ChatMessageId);
@@ -70,9 +76,10 @@ namespace moxbot
 
         public static void СonfirmMessage(string UserMessage, long? peerId, SqlConnection sqlConnection)
         {
-            try
+
+            Random rand = new Random();
+            if (UserMessage != "" && UserMessage.Length > 3)
             {
-                Random rand = new Random();
 
                 if (UserMessage[0] == 'я' && UserMessage[1] == ' ')
 
@@ -84,11 +91,7 @@ namespace moxbot
                     SendingManager.MessageToChat($"{confirmMessage}{reply}", peerId);
                 }
             }
-            catch 
-            {
-
-               Program.LongPoll();
-            }
+      
         }
 
         public static void SeparateMessage(string UserMessage, long? peerId)
