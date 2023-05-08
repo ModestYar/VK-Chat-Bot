@@ -6,58 +6,32 @@ using VkNet.Model;
 using System.Xml;
 using VkNet.Enums;
 using System.Data.SqlClient;
+using System.Collections.Specialized;
 
 namespace moxbot
 {
     internal class Controller
     {
         
-        public static void MessageToChat(string UserMessage, long? peerId, SqlConnection sqlConnection) // отправка текстовых сообщений по команде
+        public static void MessageByCommand(string UserMessage, long? peerId, SqlConnection sqlConnection) // отправка текстовых сообщений по команде
         {
                 if (SqlManager.IsExist(sqlConnection, $"SELECT COUNT(*) as count FROM Command WHERE Command = N'{UserMessage}'"))
                 {
                     string command = SqlManager.GetString(sqlConnection, $"SELECT Message FROM Command WHERE Command = N'{UserMessage}'");
 
-                    var message = new MessagesSendParams
-
-                    {
-                        Message = command,
-
-                        PeerId = peerId,
-                        RandomId = 0,
-
-                        Intent = Intent.Default
-
-
-                    };
-
-                    Program.api.Messages.SendAsync(message);
+                    SendingManager.MessageToChat(command, peerId);
                 }
         
         }
 
-        public static void StickerToChat(string UserMessage, long? peerId) // отправка текстовых сообщений по команде
+        public static void StickerByCommand(string UserMessage, long? peerId) // отправка текстовых сообщений по команде
         {
             Program program = new Program();
 
             if (UserMessage == "олег")
 
             {
-
-                var message = new MessagesSendParams
-
-                {
-                    StickerId = 76104,
-
-                    PeerId = peerId,
-                    RandomId = 0,
-
-                    Intent = Intent.Default
-
-                };
-
-                Program.api.Messages.SendAsync(message);
-
+                SendingManager.MessageToChat(76104, peerId);
             }
         }
 
@@ -68,163 +42,29 @@ namespace moxbot
                 var randomuser = Program.api.Messages.GetConversationMembers((long)peerId);
 
                 Random rnd = new Random();
+                string name = randomuser.Profiles[rnd.Next(0, randomuser.Profiles.Count)].FirstName;
 
-
-                var message = new MessagesSendParams
-
-                {
-                    Message = randomuser.Profiles[rnd.Next(0, randomuser.Profiles.Count)].FirstName,
-
-                    PeerId = peerId,
-                    RandomId = 0,
-
-                    Intent = Intent.Default
-
-
-                };
-
-                Program.api.Messages.SendAsync(message);
-
+                SendingManager.MessageToChat(name, peerId);
             }
         }
 
-        public static void TextAniimation(string UserMessage, long? peerId, long? ChatMessageId)
+        public static void TextAniimation(string UserMessage, long? peerId, long? ChatMessageId, SqlConnection sqlConnection)
         {
-            if (UserMessage == "грузи")
+            if (SqlManager.IsExist(sqlConnection, $"SELECT COUNT(*) as count FROM TextAnimationsCommands WHERE Command = N'{UserMessage}'"))
 
             {
+                SendingManager.MessageToChat("OK", peerId);
 
-                var message = new MessagesSendParams
+                int countOfLines = SqlManager.CountOfLines(sqlConnection, "SELECT COUNT(DISTINCT id) as count FROM TextAnimations");
 
+                string request = SqlManager.GetString(sqlConnection, $"SELECT Request FROM TextAnimationsCommands WHERE Command = N'{UserMessage}'");
+                
+                for (int i = 1; i < countOfLines; i++)
                 {
-                    Message = "ОК",
-
-                    PeerId = peerId,
-                    RandomId = 0,
-
-                    Intent = Intent.Default
-
-
-                };
-
-                var g = Program.api.Messages.Send(message);
-
-                for (int i = 0; i < 4; i++)
-                {
-
-                    Program.api.Messages.Edit(new MessageEditParams
-                    {
-                        Message = "Загрузка",
-
-                        ConversationMessageId = ChatMessageId + 1,
-                        PeerId = (long)peerId,
-                    });
-
-                    Thread.Sleep(500);
-
-                    Program.api.Messages.Edit(new MessageEditParams
-                    {
-                        Message = "Загрузка.",
-
-                        ConversationMessageId = ChatMessageId + 1,
-                        PeerId = (long)peerId,
-
-                    });
-                    Thread.Sleep(500);
-                    Program.api.Messages.Edit(new MessageEditParams
-                    {
-                        Message = "Загрузка..",
-
-                        ConversationMessageId = ChatMessageId + 1,
-
-                        PeerId = (long)peerId,
-
-                    });
-                    Thread.Sleep(500);
-                    Program.api.Messages.Edit(new MessageEditParams
-                    {
-                        Message = "Загрузка...",
-
-                        ConversationMessageId = ChatMessageId + 1,
-
-                        PeerId = (long)peerId,
-
-                    });
-                    Thread.Sleep(500);
+                    string message = SqlManager.GetString(sqlConnection, $"{request}{i}");
+                    SendingManager.EditMessageIntoChat(message, peerId, ChatMessageId);
+                    Thread.Sleep(1000);
                 }
-                Program.api.Messages.Edit(new MessageEditParams
-                {
-                    Message = "О",
-
-                    ConversationMessageId = ChatMessageId + 1,
-                    PeerId = (long)peerId,
-                });
-
-                Thread.Sleep(500);
-
-                Program.api.Messages.Edit(new MessageEditParams
-                {
-                    Message = "ОЛ",
-
-                    ConversationMessageId = ChatMessageId + 1,
-
-                    PeerId = (long)peerId,
-                });
-
-                Thread.Sleep(500);
-
-                Program.api.Messages.Edit(new MessageEditParams
-                {
-                    Message = "ОЛЕ",
-
-                    ConversationMessageId = ChatMessageId + 1,
-
-                    PeerId = (long)peerId,
-                });
-
-                Thread.Sleep(500);
-
-                Program.api.Messages.Edit(new MessageEditParams
-                {
-                    Message = "ОЛЕГ",
-
-                    ConversationMessageId = ChatMessageId + 1,
-
-                    PeerId = (long)peerId,
-                });
-
-                Thread.Sleep(500);
-
-                    Program.api.Messages.Edit(new MessageEditParams
-                {
-                    Message = "ОЛЕГ М",
-
-                    ConversationMessageId = ChatMessageId + 1,
-
-                    PeerId = (long)peerId,
-                });
-
-                Thread.Sleep(500);
-
-                Program.api.Messages.Edit(new MessageEditParams
-                {
-                    Message = "ОЛЕГ МО",
-
-                    ConversationMessageId = ChatMessageId + 1,
-
-                    PeerId = (long)peerId,
-
-                });
-                Thread.Sleep(500);
-                Program.api.Messages.Edit(new MessageEditParams
-                {
-                    Message = "ОЛЕГ МОХ",
-
-                    ConversationMessageId = ChatMessageId + 1,
-
-                    PeerId = (long)peerId,
-
-                });
             }
         }
 
@@ -241,21 +81,7 @@ namespace moxbot
                     int countOfMessages = SqlManager.CountOfLines(sqlConnection, "SELECT COUNT(DISTINCT id) as count FROM Confirm");
                     string confirmMessage = SqlManager.GetString(sqlConnection, $"SELECT Message FROM Confirm WHERE id = {rand.Next(1, countOfMessages)}");
 
-                    var message = new MessagesSendParams
-
-                    {
-                        Message = $"{confirmMessage}{reply} 🤔🤔🤔",
-
-                        PeerId = peerId,
-                        RandomId = 0,
-
-                        Intent = Intent.Default
-
-
-                    };
-
-                    Program.api.Messages.SendAsync(message);
-
+                    SendingManager.MessageToChat($"{confirmMessage}{reply}", peerId);
                 }
             }
             catch 
@@ -263,7 +89,6 @@ namespace moxbot
 
                Program.LongPoll();
             }
- 
         }
 
         public static void SeparateMessage(string UserMessage, long? peerId)
@@ -275,22 +100,8 @@ namespace moxbot
             {
                 for (int i = 0; i < 5; i++)
                 {
-                    var date = DateTime.Now;
                     string sepMessage = "ЕЩЁ КАКОЙ! ЯБ ЕМУ В СУП МЫШЬЯК ЗАКИНУЛ";
-                    var message = new MessagesSendParams
-
-                    {
-                        Message = sepMessage,
-
-                        PeerId = peerId,
-                        RandomId = 0,
-
-                        Intent = Intent.Default
-                        
-
-                    };
-
-                    Program.api.Messages.SendAsync(message);
+                    SendingManager.MessageToChat(sepMessage, peerId);
                     Thread.Sleep(1000);
                 }
             }
@@ -305,31 +116,13 @@ namespace moxbot
             IEnumerable<string> listValues3 = new List<string> { "олег мох" };
 
             if (UserMessage == "давай")
-
             {
                 var messageInfo = Program.api.Messages.GetByConversationMessageId((long)peerId, MessageId, listValues3);
                 foreach (var item in messageInfo.Items)
                 {
-                    var message = new MessagesSendParams
-
-                    {
-                        Message = item.Text,
-
-                        PeerId = peerId,
-                        RandomId = 0,
-
-                        Intent = Intent.Default
-
-                    };
-
-                    Program.api.Messages.SendAsync(message);
- 
+                    SendingManager.MessageToChat(item.Text, peerId);
                 }
-              
-
             }
-
-
         }
     }
 }

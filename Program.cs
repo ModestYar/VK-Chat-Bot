@@ -79,13 +79,13 @@ namespace Mohostani
 
                         getChatMesId.ChatMessageId = ((VkNet.Model.GroupUpdate.MessageNew)a.Instance).Message.ConversationMessageId;
 
-                        Controller.MessageToChat (getUserMes.UserMessage, getPeerId.PeerId, sqlConnection);
+                        Controller.MessageByCommand (getUserMes.UserMessage, getPeerId.PeerId, sqlConnection);
 
-                        Controller.StickerToChat(getUserMes.UserMessage, getPeerId.PeerId);
+                        Controller.StickerByCommand(getUserMes.UserMessage, getPeerId.PeerId);
 
                         Controller.Roullete(getUserMes.UserMessage, getPeerId.PeerId);
 
-                        Controller.TextAniimation(getUserMes.UserMessage, getPeerId.PeerId, getChatMesId.ChatMessageId);
+                        Controller.TextAniimation(getUserMes.UserMessage, getPeerId.PeerId, getChatMesId.ChatMessageId, sqlConnection);
 
                         Controller.СonfirmMessage(getUserMes.UserMessage, getPeerId.PeerId, sqlConnection);
 
