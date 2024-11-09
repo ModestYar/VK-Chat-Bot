@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using VkNet.Enums.SafetyEnums;
-using VkNet.Model.RequestParams;
 using VkNet.Model;
 
 namespace moxbot
@@ -19,7 +18,7 @@ namespace moxbot
                 Message = reply,
                 PeerId = peerId,
                 RandomId = 0,
-                Intent = Intent.Default
+                
             };
             Program.api.Messages.SendAsync(message);
         }
@@ -30,7 +29,7 @@ namespace moxbot
                 StickerId = stickerId,
                 PeerId = peerId,
                 RandomId = 0,
-                Intent = Intent.Default
+                
             };
             Program.api.Messages.SendAsync(message);
         }
@@ -41,7 +40,7 @@ namespace moxbot
             {
                 Message = reply,
                 ConversationMessageId = chatMessageId + 1,
-                PeerId = (long)peerId,
+                PeerId = (long)peerId
             });
         }
 

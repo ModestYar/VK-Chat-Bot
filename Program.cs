@@ -1,12 +1,11 @@
 ﻿using VkNet;
 using VkNet.Model;
-using VkNet.Model.RequestParams;
-using VkNet.Model.GroupUpdate;
 using VkNet.Enums.SafetyEnums;
 using moxbot;
 using System.Data;
 using System.Data.SqlClient;
 using System.Configuration;
+using VkNet.Enums.StringEnums;
 
 namespace Mohostani
 {
@@ -34,7 +33,7 @@ namespace Mohostani
             {
                 AccessToken = key
             });
-            Console.WriteLine($"ВОТ ТВОЙ ТОКЕН МУЖИК\t {api.Token} \t ПОХОДУ РОБИТ");
+            Console.WriteLine($"ПОХОДУ РОБИТ");
         } 
 
 
@@ -77,7 +76,7 @@ namespace Mohostani
 
                         getPeerId.PeerId = ((MessageNew)a.Instance).Message.PeerId;
 
-                        getChatMesId.ChatMessageId = ((VkNet.Model.GroupUpdate.MessageNew)a.Instance).Message.ConversationMessageId;
+                        getChatMesId.ChatMessageId = ((MessageNew)a.Instance).Message.ConversationMessageId;
 
                         Controller.MessageByCommand (getUserMes.UserMessage, getPeerId.PeerId, sqlConnection);
 
@@ -91,7 +90,7 @@ namespace Mohostani
 
                         Controller.SeparateMessage(getUserMes.UserMessage, getPeerId.PeerId);
 
-                        Controller.RandomMessage(getUserMes.UserMessage, getPeerId.PeerId);
+                        Controller.RandomMessage(getUserMes.UserMessage, getPeerId.PeerId, Convert.ToInt32(getChatMesId.ChatMessageId));
                     }
                 }
             LongPoll();

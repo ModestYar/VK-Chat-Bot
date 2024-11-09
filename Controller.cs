@@ -1,7 +1,6 @@
 ﻿using Mohostani;
 using System;
 using VkNet.Enums.SafetyEnums;
-using VkNet.Model.RequestParams;
 using VkNet.Model;
 using System.Xml;
 using VkNet.Enums;
@@ -46,9 +45,11 @@ namespace moxbot
                     var randomuser = Program.api.Messages.GetConversationMembers((long)peerId);
                     string reply = UserMessage.TrimStart(who.ToCharArray()).TrimEnd('?');
                     Random rnd = new Random();
-                    string name = randomuser.Profiles[rnd.Next(0, randomuser.Profiles.Count)].FirstName;
+                    int target = rnd.Next(0, randomuser.Profiles.Count);
+                    string name = randomuser.Profiles[target].FirstName;
+                    string surname = randomuser.Profiles[target].LastName;
 
-                    SendingManager.MessageToChat($"{name}{reply}", peerId);
+                    SendingManager.MessageToChat($"{name} {surname}{reply}", peerId);
                 }
             }
 
@@ -69,29 +70,24 @@ namespace moxbot
                 {
                     string message = SqlManager.GetString(sqlConnection, $"{request}{i}");
                     SendingManager.EditMessageIntoChat(message, peerId, ChatMessageId);
-                    Thread.Sleep(1000);
+                    Thread.Sleep(300);
                 }
             }
         }
 
         public static void СonfirmMessage(string UserMessage, long? peerId, SqlConnection sqlConnection)
         {
-
             Random rand = new Random();
             if (UserMessage != "" && UserMessage.Length > 3)
             {
-
                 if (UserMessage[0] == 'я' && UserMessage[1] == ' ')
-
                 {
                     string reply = UserMessage.TrimStart('я');
                     int countOfMessages = SqlManager.CountOfLines(sqlConnection, "SELECT COUNT(DISTINCT id) as count FROM Confirm");
                     string confirmMessage = SqlManager.GetString(sqlConnection, $"SELECT Message FROM Confirm WHERE id = {rand.Next(1, countOfMessages)}");
-
                     SendingManager.MessageToChat($"{confirmMessage}{reply}", peerId);
                 }
             }
-      
         }
 
         public static void SeparateMessage(string UserMessage, long? peerId)
@@ -110,12 +106,12 @@ namespace moxbot
             }
         }
 
-        public static void RandomMessage(string UserMessage, long? peerId)
+        public static void RandomMessage(string UserMessage, long? peerId, int lastMessageId)
         {
 
             var rand = new Random();
 
-            IEnumerable<ulong> MessageId = new List<ulong> { (ulong)rand.Next(741500,742000) };
+            IEnumerable<ulong> MessageId = new List<ulong> { (ulong)rand.Next(741500,750000) };
             IEnumerable<string> listValues3 = new List<string> { "олег мох" };
 
             if (UserMessage == "давай")

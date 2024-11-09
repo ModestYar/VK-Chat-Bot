@@ -34,7 +34,7 @@ namespace moxbot
             bool isExist = false;
             SqlCommand command = new SqlCommand(request, sqlConnection);
 
-            int confirmMessage = Convert.ToInt32(command.ExecuteScalar());
+            int confirmMessage = Convert.ToInt32(command.ExecuteScalar()); // System.Data.SqlClient.SqlException: "Incorrect syntax near 't'.  Unclosed quotation mark after the character string ''."
             if (confirmMessage == 1)
                 isExist = true;
 
